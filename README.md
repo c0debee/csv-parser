@@ -1,6 +1,4 @@
 # CSV Parser
- A minimalist C library for parsing CSV files with ease and efficiency.
-
 *Overview:*
 
 The CSV Parser Library provides functions to parse CSV files and store the data in a structured format. It consists of two main structures: `CSVRow` representing a single row in the CSV file, and `CSVTable` representing the entire CSV table.
