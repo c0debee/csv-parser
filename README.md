@@ -1,5 +1,8 @@
 # CSV Parser
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build](https://github.com/c0debee/csv-parser/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/c0debee/csv-parser/actions/workflows/build.yml)
+
+
 *Overview:*
 
 The CSV Parser Library provides functions to parse CSV files and store the data in a structured format. It consists of two main structures: `CSVRow` representing a single row in the CSV file, and `CSVTable` representing the entire CSV table.
