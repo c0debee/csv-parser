@@ -1,0 +1,19 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up C environment
+      uses: actions/setup-cxx@v2
+      with:
+        compiler: gcc
+
+    - name: Build
+      run: make
