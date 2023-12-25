@@ -18,6 +18,12 @@ CSVRow parse_csv_row(const char *line) {
         strncpy(row.fields[row.num_fields], token, MAX_FIELD_SIZE - 1);
         row.fields[row.num_fields][MAX_FIELD_SIZE - 1] = '\0';
 
+        // Remove newline character if present in the last field
+        size_t len = strlen(row.fields[row.num_fields]);
+        if (len > 0 && row.fields[row.num_fields][len - 1] == '\n') {
+            row.fields[row.num_fields][len - 1] = '\0';
+        }
+
         row.num_fields++;
         token = strtok(NULL, ",");
     }
