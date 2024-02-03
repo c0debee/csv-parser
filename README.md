@@ -94,3 +94,4 @@ int main() {
 *Note:*
 - Ensure that the CSV file follows the standard CSV format with fields separated by commas.
 - The library handles memory allocation for rows and fields, but it's important to free the memory using `free_csv_table` or `free_csv_row` to avoid memory leaks.
+
