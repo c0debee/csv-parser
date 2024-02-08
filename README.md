@@ -1,7 +1,6 @@
 # CSV Parser
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build](https://github.com/c0debee/csv-parser/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/c0debee/csv-parser/actions/workflows/build.yml)
-[![CI](https://github.com/c0debee/csv-parser/actions/workflows/CI/badge.svg?branch=main)](https://github.com/c0debee/csv-parser/actions/workflows/build.yml)
 
 
 *Overview:*
