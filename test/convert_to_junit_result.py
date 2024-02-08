@@ -1,4 +1,13 @@
+import os
 import xml.etree.ElementTree as ET
+
+# Uncomment for github workflows
+input_file_path = os.path.join(os.getenv('GITHUB_WORKSPACE'), 'result/test_result')
+output_file_path = os.path.join(os.getenv('GITHUB_WORKSPACE'),'result/junit_results.xml')
+
+# Uncomment for local test
+#input_file_path = 'result/test_result'
+#output_file_path = 'result/junit_results.xml'
 
 def convert_to_junit_xml(test_results):
     testsuite = ET.Element('testsuite', name='TestSuite', tests=str(len(test_results)), failures=str(count_failures(test_results)), errors='0', skipped='0')
@@ -11,7 +20,7 @@ def convert_to_junit_xml(test_results):
             skipped = ET.SubElement(test_case, 'skipped')
 
     tree = ET.ElementTree(testsuite)
-    tree.write('result/junit_results.xml', xml_declaration=True, encoding='utf-8')
+    tree.write(output_file_path, xml_declaration=True, encoding='utf-8')
 
 def count_failures(test_results):
     return sum(1 for result in test_results if result['status'] == 'FAIL')
@@ -39,8 +48,6 @@ def read_test_results_from_file(file_path):
     return test_results
 
 if __name__ == "__main__":
-    # Specify the path to the input text file
-    input_file_path = 'result/test_result'
 
     # Read test results from the input file
     test_results = read_test_results_from_file(input_file_path)
