@@ -15,7 +15,7 @@ void tearDown(void) {
 
 // Test for parse_csv_row function
 void test_parse_csv_row(void) {
-    const char *csv_line = "John,25,New York";
+    const char *csv_line = "John ,25,New York";
     CSVRow row = parse_csv_row(csv_line);
 
     // Assert statements to check the correctness of the parsed CSVRow
