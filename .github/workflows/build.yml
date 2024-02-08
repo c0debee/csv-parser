@@ -2,9 +2,10 @@ name: Build
 
 on: [push, pull_request]
 
+permissions:
+  checks: write
+
 jobs:
-  permissions:
-    checks: write
 
   build:
     runs-on: ubuntu-latest
