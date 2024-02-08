@@ -28,11 +28,14 @@ $(LIBRARY_OBJECTS): $(LIBRARY_SOURCES) $(LIBRARY_HEADERS)
 	$(CC) $(CFLAGS) -c $(LIBRARY_SOURCES)
 
 # Test target
-test: $(TEST_MARKER)
+test: clean_test_marker $(TEST_MARKER)
+
+clean_test_marker:
+	rm -f $(TEST_MARKER)
 
 $(TEST_MARKER): $(TEST_SOURCES) $(LIBRARY_SOURCES) $(LIBRARY_HEADERS) $(UNITY_SOURCES) $(UNITY_INTERNALS_HEADER)
 	$(CC) $(CFLAGS) -o test_runner $(TEST_SOURCES) $(LIBRARY_SOURCES) $(UNITY_SOURCES)
-	./test_runner
+	-./test_runner > test/result/test_result 2>&1
 	touch $(TEST_MARKER)
 	rm -f test_runner
 

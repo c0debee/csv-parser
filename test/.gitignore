@@ -1,1 +1,3 @@
 test_marker
+result/test_result
+result/junit_results.xml
