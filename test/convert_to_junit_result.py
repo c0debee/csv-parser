@@ -2,8 +2,8 @@ import os
 import xml.etree.ElementTree as ET
 
 # Uncomment for github workflows
-input_file_path = os.path.join(os.getenv('GITHUB_WORKSPACE'), 'result/test_result')
-output_file_path = os.path.join(os.getenv('GITHUB_WORKSPACE'),'result/junit_results.xml')
+input_file_path = os.path.join(os.getenv('GITHUB_WORKSPACE'), 'test/result/test_result')
+output_file_path = os.path.join(os.getenv('GITHUB_WORKSPACE'),'test/result/junit_results.xml')
 
 # Uncomment for local test
 #input_file_path = 'result/test_result'
