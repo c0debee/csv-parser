@@ -8,44 +8,27 @@ CSVRow parse_csv_row(const char* line) {
     row.fields = NULL;
     row.num_fields = 0;
 
-    // Duplicate the line to avoid modifying the original string
-    char* line_copy = malloc(strlen(line)+1);
-    strcpy(line_copy,line);
+    size_t line_length = strcspn(line, "\r\n");
+    size_t field_start = 0;
 
-    char* token = strtok((char*)line_copy, ",");
-    while (token != NULL) {
-        
-        // Remove \n and \r characters from the token
-        char *newline_char = strchr(token, '\n');
-        if (newline_char != NULL) {
-            *newline_char = '\0';
+    for (size_t i = 0; i <= line_length; i++) {
+        if (i != line_length && line[i] != ',') {
+            continue;
         }
 
-        char *carriage_return_char = strchr(token, '\r');
-        if (carriage_return_char != NULL) {
-            *carriage_return_char = '\0';
-        }
-
-        // Allocate memory for a new field
+        size_t field_length = i - field_start;
         row.fields = (char**)realloc(row.fields, (row.num_fields + 1) * sizeof(char*));
         row.fields[row.num_fields] = (char*)malloc(MAX_FIELD_SIZE);
 
-        // Copy the token to the field, ensuring it's null-terminated
-        strncpy(row.fields[row.num_fields], token, MAX_FIELD_SIZE - 1);
-        row.fields[row.num_fields][MAX_FIELD_SIZE - 1] = '\0';
-
-        // Remove newline character if present in the last field
-        size_t len = strlen(row.fields[row.num_fields]);
-        if (len > 0 && row.fields[row.num_fields][len - 1] == '\n') {
-            row.fields[row.num_fields][len - 1] = '\0';
-        }
+        size_t copy_length = field_length < MAX_FIELD_SIZE - 1
+            ? field_length
+            : MAX_FIELD_SIZE - 1;
+        memcpy(row.fields[row.num_fields], line + field_start, copy_length);
+        row.fields[row.num_fields][copy_length] = '\0';
 
         row.num_fields++;
-        token = strtok(NULL, ",");
+        field_start = i + 1;
     }
-
-    // Free the duplicated line
-    free(line_copy);
 
     return row;
 }

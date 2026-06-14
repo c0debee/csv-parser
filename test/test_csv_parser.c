@@ -28,6 +28,37 @@ void test_parse_csv_row(void) {
     free_csv_row(&row);
 }
 
+void test_parse_csv_row_preserves_empty_fields(void) {
+    CSVRow row = parse_csv_row("a,,c");
+
+    TEST_ASSERT_EQUAL_INT(3, row.num_fields);
+    TEST_ASSERT_EQUAL_STRING("a", row.fields[0]);
+    TEST_ASSERT_EQUAL_STRING("", row.fields[1]);
+    TEST_ASSERT_EQUAL_STRING("c", row.fields[2]);
+
+    free_csv_row(&row);
+}
+
+void test_parse_csv_row_preserves_leading_and_trailing_empty_fields(void) {
+    CSVRow row = parse_csv_row(",a,");
+
+    TEST_ASSERT_EQUAL_INT(3, row.num_fields);
+    TEST_ASSERT_EQUAL_STRING("", row.fields[0]);
+    TEST_ASSERT_EQUAL_STRING("a", row.fields[1]);
+    TEST_ASSERT_EQUAL_STRING("", row.fields[2]);
+
+    free_csv_row(&row);
+}
+
+void test_parse_csv_row_treats_empty_line_as_empty_field(void) {
+    CSVRow row = parse_csv_row("\r\n");
+
+    TEST_ASSERT_EQUAL_INT(1, row.num_fields);
+    TEST_ASSERT_EQUAL_STRING("", row.fields[0]);
+
+    free_csv_row(&row);
+}
+
 // Test for parse_csv_file function
 void test_parse_csv_file(void) {
     const char *filename = "examples/example.csv";
@@ -92,6 +123,9 @@ int main(void) {
 
     // Run the tests
     RUN_TEST(test_parse_csv_row);
+    RUN_TEST(test_parse_csv_row_preserves_empty_fields);
+    RUN_TEST(test_parse_csv_row_preserves_leading_and_trailing_empty_fields);
+    RUN_TEST(test_parse_csv_row_treats_empty_line_as_empty_field);
     RUN_TEST(test_parse_csv_file);
     RUN_TEST(test_free_csv_row);
     RUN_TEST(test_free_csv_table);
