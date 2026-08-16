@@ -3,8 +3,6 @@
 
 #include <stddef.h>
 
-#define MAX_FIELD_SIZE 100
-
 // Structure representing a single row in the CSV file
 typedef struct {
     char **fields;     // Array of strings representing individual fields in the row

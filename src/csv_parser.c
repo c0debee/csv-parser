@@ -4,7 +4,7 @@
 #include <string.h>
 #include "csv_parser.h"
 
-#define RECORD_READ_BUFFER_SIZE (MAX_FIELD_SIZE * 10)
+#define RECORD_READ_BUFFER_SIZE 1024
 
 // Read until the physical line is complete.
 // This keeps a long record from being parsed as multiple rows.
@@ -69,13 +69,10 @@ CSVRow parse_csv_row(const char* line) {
 
         size_t field_length = i - field_start;
         row.fields = (char**)realloc(row.fields, (row.num_fields + 1) * sizeof(char*));
-        row.fields[row.num_fields] = (char*)malloc(MAX_FIELD_SIZE);
+        row.fields[row.num_fields] = (char*)malloc(field_length + 1);
 
-        size_t copy_length = field_length < MAX_FIELD_SIZE - 1
-            ? field_length
-            : MAX_FIELD_SIZE - 1;
-        memcpy(row.fields[row.num_fields], line + field_start, copy_length);
-        row.fields[row.num_fields][copy_length] = '\0';
+        memcpy(row.fields[row.num_fields], line + field_start, field_length);
+        row.fields[row.num_fields][field_length] = '\0';
 
         row.num_fields++;
         field_start = i + 1;
