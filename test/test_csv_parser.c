@@ -60,6 +60,26 @@ void test_parse_csv_row_treats_empty_line_as_empty_field(void) {
     free_csv_row(&row);
 }
 
+void test_parse_csv_row_preserves_long_fields(void) {
+    enum { LONG_FIELD_LENGTH = 256 };
+    char expected[LONG_FIELD_LENGTH + 1];
+    char csv_line[LONG_FIELD_LENGTH + sizeof(",tail")];
+
+    memset(expected, 'x', LONG_FIELD_LENGTH);
+    expected[LONG_FIELD_LENGTH] = '\0';
+    memcpy(csv_line, expected, LONG_FIELD_LENGTH);
+    memcpy(csv_line + LONG_FIELD_LENGTH, ",tail", sizeof(",tail"));
+
+    CSVRow row = parse_csv_row(csv_line);
+
+    TEST_ASSERT_EQUAL_size_t(2, row.num_fields);
+    TEST_ASSERT_EQUAL_size_t(LONG_FIELD_LENGTH, strlen(row.fields[0]));
+    TEST_ASSERT_EQUAL_STRING(expected, row.fields[0]);
+    TEST_ASSERT_EQUAL_STRING("tail", row.fields[1]);
+
+    free_csv_row(&row);
+}
+
 // Test for parse_csv_file function
 void test_parse_csv_file(void) {
     const char *filename = "examples/example.csv";
@@ -152,6 +172,7 @@ int main(void) {
     RUN_TEST(test_parse_csv_row_preserves_empty_fields);
     RUN_TEST(test_parse_csv_row_preserves_leading_and_trailing_empty_fields);
     RUN_TEST(test_parse_csv_row_treats_empty_line_as_empty_field);
+    RUN_TEST(test_parse_csv_row_preserves_long_fields);
     RUN_TEST(test_parse_csv_file);
     RUN_TEST(test_parse_csv_file_keeps_long_record_as_single_row);
     RUN_TEST(test_free_csv_row);
