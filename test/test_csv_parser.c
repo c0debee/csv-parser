@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "../src/csv_parser.h"
@@ -74,6 +75,31 @@ void test_parse_csv_file(void) {
     free_csv_table(&table);
 }
 
+void test_parse_csv_file_keeps_long_record_as_single_row(void) {
+    const char *filename = "test/result/long_record.csv";
+    FILE *file = fopen(filename, "w");
+    TEST_ASSERT_NOT_NULL(file);
+
+    for (size_t i = 0; i < 300; i++) {
+        fprintf(file, "field%03zu%s", i, i < 299 ? "," : "\n");
+    }
+    fputs("tail,row\n", file);
+    fclose(file);
+
+    CSVTable table = parse_csv_file(filename);
+
+    TEST_ASSERT_EQUAL_size_t(2, table.num_rows);
+    TEST_ASSERT_EQUAL_size_t(300, table.rows[0].num_fields);
+    TEST_ASSERT_EQUAL_STRING("field000", table.rows[0].fields[0]);
+    TEST_ASSERT_EQUAL_STRING("field299", table.rows[0].fields[299]);
+    TEST_ASSERT_EQUAL_size_t(2, table.rows[1].num_fields);
+    TEST_ASSERT_EQUAL_STRING("tail", table.rows[1].fields[0]);
+    TEST_ASSERT_EQUAL_STRING("row", table.rows[1].fields[1]);
+
+    free_csv_table(&table);
+    remove(filename);
+}
+
 // Test for free_csv_row function
 void test_free_csv_row(void) {
     // Create a CSVRow to be freed
@@ -127,6 +153,7 @@ int main(void) {
     RUN_TEST(test_parse_csv_row_preserves_leading_and_trailing_empty_fields);
     RUN_TEST(test_parse_csv_row_treats_empty_line_as_empty_field);
     RUN_TEST(test_parse_csv_file);
+    RUN_TEST(test_parse_csv_file_keeps_long_record_as_single_row);
     RUN_TEST(test_free_csv_row);
     RUN_TEST(test_free_csv_table);
 

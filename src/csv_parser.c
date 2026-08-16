@@ -1,7 +1,58 @@
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include "csv_parser.h"
+
+#define RECORD_READ_BUFFER_SIZE (MAX_FIELD_SIZE * 10)
+
+// Read until the physical line is complete.
+// This keeps a long record from being parsed as multiple rows.
+static int read_csv_line(FILE *file, char **line, size_t *capacity) {
+    char chunk[RECORD_READ_BUFFER_SIZE];
+    size_t line_length = 0;
+
+    while (fgets(chunk, sizeof(chunk), file) != NULL) {
+        size_t chunk_length = strlen(chunk);
+
+        // Make sure the required buffer size cannot wrap around.
+        if (chunk_length > SIZE_MAX - line_length - 1) {
+            return -1;
+        }
+
+        size_t required_capacity = line_length + chunk_length + 1;
+        if (required_capacity > *capacity) {
+            size_t new_capacity = *capacity == 0 ? sizeof(chunk) : *capacity;
+
+            while (new_capacity < required_capacity) {
+                if (new_capacity > SIZE_MAX / 2) {
+                    new_capacity = required_capacity;
+                    break;
+                }
+                new_capacity *= 2;
+            }
+
+            // Keep the old buffer valid if realloc fails.
+            char *resized_line = realloc(*line, new_capacity);
+            if (resized_line == NULL) {
+                return -1;
+            }
+
+            *line = resized_line;
+            *capacity = new_capacity;
+        }
+
+        // Append over the previous terminator and copy the new terminator as well.
+        memcpy(*line + line_length, chunk, chunk_length + 1);
+        line_length += chunk_length;
+
+        if (line_length > 0 && (*line)[line_length - 1] == '\n') {
+            return 1;
+        }
+    }
+
+    return line_length > 0 ? 1 : 0;
+}
 
 CSVRow parse_csv_row(const char* line) {
     CSVRow row;
@@ -55,13 +106,24 @@ CSVTable parse_csv_file(const char *filename) {
         exit(EXIT_FAILURE);
     }
 
-    char line[MAX_FIELD_SIZE * 10]; // Assuming a reasonable maximum line size
+    char *line = NULL;
+    size_t line_capacity = 0;
+    int read_status;
 
-    while (fgets(line, sizeof(line), file) != NULL) {
+    while ((read_status = read_csv_line(file, &line, &line_capacity)) > 0) {
         // Allocate memory for a new row
         table.rows = realloc(table.rows, (table.num_rows + 1) * sizeof(CSVRow));
         table.rows[table.num_rows] = parse_csv_row(line);
         table.num_rows++;
+    }
+
+    free(line);
+
+    if (read_status < 0) {
+        fclose(file);
+        free_csv_table(&table);
+        fprintf(stderr, "Error: CSV record is too large or memory allocation failed\n");
+        exit(EXIT_FAILURE);
     }
 
     fclose(file);
